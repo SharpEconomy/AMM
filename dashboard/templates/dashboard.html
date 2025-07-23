@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AMM Dashboard</title>
+</head>
+<body>
+    <h1>AMM Dashboard</h1>
+    {% if snapshot %}
+    <p>Uniswap Price: {{ snapshot.uniswap_price }}</p>
+    <p>Bitmart Price: {{ snapshot.bitmart_price }}</p>
+    <p>Coinstore Price: {{ snapshot.coinstore_price }}</p>
+    <p>Last Updated: {{ snapshot.timestamp }}</p>
+    {% else %}
+    <p>No data yet</p>
+    {% endif %}
+    <h2>Opportunities</h2>
+    <table border="1">
+        <tr><th>Timestamp</th><th>Delta %</th><th>Uniswap Price</th><th>Avg Price</th></tr>
+        {% for op in opportunities %}
+        <tr>
+            <td>{{ op.timestamp }}</td>
+            <td>{{ op.delta_percent|floatformat:2 }}</td>
+            <td>{{ op.uniswap_price }}</td>
+            <td>{{ op.average_price }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No opportunities logged</td></tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
