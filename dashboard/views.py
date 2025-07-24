@@ -1,16 +1,94 @@
-"""Views for the simple monitoring dashboard."""
+"""Views for the monitoring dashboard and login flow."""
 
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from __future__ import annotations
+
+import json
+import os
+from functools import wraps
+from typing import Any, Callable
+
+
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_POST
+
+from amm_controller import settings
 
 from .models import OpportunityLog, PriceSnapshot
 from services.uniswap import get_pool_data
 from services.cex_price import get_average_price
+from jobs.sync import sync_prices
+import pyotp
 
 
+def _require_login(view: Callable[[HttpRequest], Any]) -> Callable[[HttpRequest], Any]:
+    """Decorator that redirects to the login page when not authenticated."""
+
+    @wraps(view)
+    def wrapper(request: HttpRequest, *args: Any, **kwargs: Any) -> Any:
+        if not request.session.get("authenticated"):
+            return redirect("login")
+        return view(request, *args, **kwargs)
+
+    return wrapper
+
+
+def _allowed_email(email: str) -> bool:
+    return any(email.endswith("@" + d) for d in settings.ALLOWED_EMAIL_DOMAINS)
+
+
+
+
+def login_view(request: HttpRequest) -> HttpResponse:
+    """Render the login form and handle OTP submission."""
+
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        email = request.POST.get("email", "").strip().lower()
+        otp = request.POST.get("otp", "").strip()
+
+        if not _allowed_email(email):
+            return render(request, "login.html", {"error": "Invalid email"})
+
+        totp = pyotp.TOTP(settings.OTP_SECRET)
+        if not totp.verify(otp, valid_window=1):
+            return render(request, "login.html", {"error": "Invalid OTP"})
+
+        request.session.update({"authenticated": True, "name": name, "email": email})
+        return redirect("dashboard")
+
+    return render(request, "login.html")
+
+
+@require_POST
+def auto_login(request: HttpRequest) -> HttpResponse:
+    """Authenticate using data stored in ``localStorage``."""
+
+    try:
+        data = json.loads(request.body.decode())
+    except json.JSONDecodeError:
+        return HttpResponse(status=400)
+
+    email = str(data.get("email", "")).lower()
+    name = str(data.get("name", "")).strip()
+    if _allowed_email(email):
+        request.session.update({"authenticated": True, "name": name, "email": email})
+        return HttpResponse("OK")
+
+    return HttpResponse(status=400)
+
+
+def logout_view(request: HttpRequest) -> HttpResponse:
+    """Clear the session and redirect to login."""
+
+    request.session.flush()
+    return redirect("login")
+
+
+@_require_login
 def dashboard(request: HttpRequest) -> HttpResponse:
-    """Render the dashboard with the latest price snapshot."""
+    """Render dashboard page."""
     latest_snapshot = PriceSnapshot.objects.order_by("-timestamp").first()
     opportunities = OpportunityLog.objects.order_by("-timestamp")[:20]
     if not latest_snapshot:
@@ -27,3 +105,64 @@ def dashboard(request: HttpRequest) -> HttpResponse:
         "opportunities": opportunities,
     }
     return render(request, "dashboard.html", context)
+
+
+@_require_login
+def api_latest(request: HttpRequest) -> JsonResponse:
+    """Return the most recent price snapshot, creating one if necessary."""
+
+    snap = PriceSnapshot.objects.order_by("-timestamp").first()
+    if not snap:
+        uni_data = get_pool_data()
+        _, bm, cs = get_average_price()
+        snap = PriceSnapshot.objects.create(
+            timestamp=timezone.now(),
+            uniswap_price=uni_data["price"],
+            bitmart_price=bm,
+            coinstore_price=cs,
+        )
+    return JsonResponse(
+        {
+            "timestamp": snap.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "uniswap_price": snap.uniswap_price,
+            "bitmart_price": snap.bitmart_price,
+            "coinstore_price": snap.coinstore_price,
+        }
+    )
+
+
+@_require_login
+def api_opportunities(request: HttpRequest) -> JsonResponse:
+    """Return recent logged opportunities."""
+
+    ops = OpportunityLog.objects.order_by("-timestamp")[:20]
+    data = [
+        {
+            "timestamp": o.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "delta_percent": o.delta_percent,
+            "uniswap_price": o.uniswap_price,
+            "average_price": o.average_price,
+        }
+        for o in ops
+    ]
+    return JsonResponse(data, safe=False)
+
+
+@_require_login
+@require_POST
+def api_manual_sync(request: HttpRequest) -> JsonResponse:
+    """Trigger an immediate price sync."""
+
+    sync_prices()
+    return JsonResponse({"status": "ok"})
+
+
+@_require_login
+@require_POST
+def api_rebalance(request: HttpRequest) -> JsonResponse:
+    """Execute a rebalance action if a private key is configured."""
+
+    if not os.environ.get("PRIVATE_KEY"):
+        return JsonResponse({"message": "Read-only mode"})
+    # Placeholder for actual contract interaction
+    return JsonResponse({"message": "Rebalance executed"})
