@@ -1,30 +1,66 @@
+"""Helpers for fetching CEX prices."""
+
+import json
+from typing import Optional, Tuple
+
 import requests
-import re
 
-BITMART_URL = "https://www.bitmart.com/trade/en-US?type=spot&symbol=SHARP_USDT"
-COINSTORE_URL = "https://www.coinstore.com/spot/SHARPUSDT"
+BITMART_URL = "https://api-cloud.bitmart.com/spot/quotation/v3/tickers?symbol=SHARP_USDT"
+COINSTORE_URL = "https://api.coinstore.com/api/v1/ticker?symbol=SHARPUSDT"
 
 
-def fetch_bitmart_price():
-    resp = requests.get(BITMART_URL, timeout=10)
-    m = re.search(r'"lastPrice":"([0-9.]+)"', resp.text)
-    if not m:
+def _safe_request(url: str) -> Optional[str]:
+    try:
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        return resp.text
+    except requests.RequestException:
         return None
-    return float(m.group(1))
 
 
-def fetch_coinstore_price():
-    resp = requests.get(COINSTORE_URL, timeout=10)
-    m = re.search(r'"last":"([0-9.]+)"', resp.text)
-    if not m:
+def fetch_bitmart_price() -> Optional[float]:
+    """Return the latest Bitmart price or ``None`` on failure."""
+    text = _safe_request(BITMART_URL)
+    if not text:
         return None
-    return float(m.group(1))
+    try:
+        data = json.loads(text)
+        tickers = data.get("data")
+        if isinstance(tickers, dict):
+            tickers = tickers.get("tickers")
+        if isinstance(tickers, list) and tickers:
+            ticker = tickers[0]
+            if isinstance(ticker, dict) and "last_price" in ticker:
+                return float(ticker["last_price"])
+    except (ValueError, json.JSONDecodeError, TypeError):
+        pass
+    return None
 
 
-def get_average_price():
+def fetch_coinstore_price() -> Optional[float]:
+    """Return the latest Coinstore price or ``None`` on failure."""
+    text = _safe_request(COINSTORE_URL)
+    if not text:
+        return None
+    try:
+        data = json.loads(text)
+        price = None
+        if isinstance(data, dict):
+            inner = data.get("data")
+            if isinstance(inner, dict) and "last" in inner:
+                price = inner["last"]
+        if price is not None:
+            return float(price)
+    except (ValueError, json.JSONDecodeError, TypeError):
+        pass
+    return None
+
+
+def get_average_price() -> Tuple[Optional[float], Optional[float], Optional[float]]:
+    """Return the average price along with individual exchange prices."""
     bm = fetch_bitmart_price()
     cs = fetch_coinstore_price()
-    prices = [p for p in [bm, cs] if p is not None]
+    prices = [p for p in (bm, cs) if p is not None]
     if not prices:
         return None, bm, cs
     return sum(prices) / len(prices), bm, cs

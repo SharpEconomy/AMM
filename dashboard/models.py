@@ -1,3 +1,5 @@
+"""Database models for price snapshots and opportunities."""
+
 from django.db import models
 
 
