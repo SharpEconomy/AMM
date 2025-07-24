@@ -19,17 +19,19 @@ def sync_prices() -> None:
     """Fetch prices from DEX and CEX and log large deltas."""
     uni_data = get_pool_data()
     avg, bm, cs = get_average_price()
-    if avg is None:
-        return
 
     uni_price = uni_data["price"]
-    delta = abs(uni_price - avg) / avg
     PriceSnapshot.objects.create(
         timestamp=timezone.now(),
         uniswap_price=uni_price,
         bitmart_price=bm,
         coinstore_price=cs,
     )
+
+    if avg is None:
+        return
+
+    delta = abs(uni_price - avg) / avg
     if delta > THRESHOLD:
         OpportunityLog.objects.create(
             timestamp=timezone.now(),

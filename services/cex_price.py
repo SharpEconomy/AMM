@@ -1,17 +1,12 @@
 """Helpers for fetching CEX prices."""
 
-import re
+import json
 from typing import Optional, Tuple
 
 import requests
 
-BITMART_URL = "https://www.bitmart.com/trade/en-US?type=spot&symbol=SHARP_USDT"
-COINSTORE_URL = "https://www.coinstore.com/spot/SHARPUSDT"
-
-
-_BITMART_RE = re.compile(r'"lastPrice":"([0-9.]+)"')
-_COINSTORE_RE = re.compile(r'"last":"([0-9.]+)"')
-
+BITMART_URL = "https://api-cloud.bitmart.com/spot/quotation/v3/tickers?symbol=SHARP_USDT"
+COINSTORE_URL = "https://api.coinstore.com/api/v1/ticker?symbol=SHARPUSDT"
 
 def _safe_request(url: str) -> Optional[str]:
     try:
@@ -27,17 +22,23 @@ def fetch_bitmart_price() -> Optional[float]:
     text = _safe_request(BITMART_URL)
     if not text:
         return None
-    match = _BITMART_RE.search(text)
-    return float(match.group(1)) if match else None
-
+    try:
+        data = json.loads(text)
+        ticker = data["data"]["tickers"][0]
+        return float(ticker["last_price"])
+    except (KeyError, ValueError, IndexError, json.JSONDecodeError):
+        return None
 
 def fetch_coinstore_price() -> Optional[float]:
     """Return the latest Coinstore price or ``None`` on failure."""
     text = _safe_request(COINSTORE_URL)
     if not text:
+      return None
+    try:
+        data = json.loads(text)
+        return float(data["data"]["last"])
+    except (KeyError, ValueError, json.JSONDecodeError):
         return None
-    match = _COINSTORE_RE.search(text)
-    return float(match.group(1)) if match else None
 
 
 def get_average_price() -> Tuple[Optional[float], Optional[float], Optional[float]]:

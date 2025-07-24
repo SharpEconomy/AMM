@@ -7,8 +7,8 @@
     <h1>AMM Dashboard</h1>
     {% if snapshot %}
     <p>Uniswap Price: {{ snapshot.uniswap_price }}</p>
-    <p>Bitmart Price: {{ snapshot.bitmart_price }}</p>
-    <p>Coinstore Price: {{ snapshot.coinstore_price }}</p>
+    <p>Bitmart Price: {{ snapshot.bitmart_price|default:"N/A" }}</p>
+    <p>Coinstore Price: {{ snapshot.coinstore_price|default:"N/A" }}</p>
     <p>Last Updated: {{ snapshot.timestamp }}</p>
     {% else %}
     <p>No data yet</p>
