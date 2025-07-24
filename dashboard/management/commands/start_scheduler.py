@@ -1,3 +1,5 @@
+"""Management command to run the APScheduler worker."""
+
 from django.core.management.base import BaseCommand
 from jobs import sync
 
