@@ -16,13 +16,22 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
    ```
    The scheduler runs in-process and syncs prices every minute by default.
    Set `SYNC_INTERVAL_SECONDS` to change the interval.
+4. Before deploying, collect static files:
+   ```bash
+   python manage.py collectstatic --noinput
+   ```
 
 ## Management Commands
 
 - `python manage.py start_scheduler` – run the scheduler alone.
 
-The dashboard is available at `/` and Django admin at `/admin/`.
-Bitmart and Coinstore prices may show as `N/A` if their APIs are unreachable.
+The dashboard is available at `/` and provides a single-page interface for all
+features. Bitmart and Coinstore prices may show as `N/A` if their APIs are
+unreachable.
+
+Authentication has been removed; anyone with access to the app URL can view the
+dashboard.
+
 
 ## Deploying to Render
 
@@ -40,5 +49,5 @@ variables in the Render dashboard:
 - `ALLOWED_HOSTS` – comma-separated list of allowed hosts (optional)
 - `RENDER_EXTERNAL_HOSTNAME` will be added automatically if provided by Render
 
-Render will automatically install requirements, run migrations via the
-`preDeployCommand`, and start the app with Gunicorn.
+Render will automatically install requirements, run migrations and collect
+static files via the `preDeployCommand`, and start the app with Gunicorn.
