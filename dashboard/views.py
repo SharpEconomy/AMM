@@ -1,14 +1,12 @@
-"""Views for the monitoring dashboard and login flow."""
+"""Views for the monitoring dashboard."""
 
 from __future__ import annotations
 
 import json
 import os
-from functools import wraps
-from typing import Any, Callable
 
 from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
@@ -18,62 +16,6 @@ from .models import OpportunityLog, PriceSnapshot, DashboardUser
 from services.uniswap import get_pool_data
 from services.cex_price import get_average_price
 from jobs.sync import sync_prices
-import pyotp
-
-
-def _require_login(view: Callable[[HttpRequest], Any]) -> Callable[[HttpRequest], Any]:
-    """Decorator that redirects to the login page when not authenticated."""
-
-    @wraps(view)
-    def wrapper(request: HttpRequest, *args: Any, **kwargs: Any) -> Any:
-        if not request.session.get("authenticated"):
-            return redirect("login")
-        return view(request, *args, **kwargs)
-
-    return wrapper
-
-
-def _allowed_email(email: str) -> bool:
-    return any(email.endswith("@" + d) for d in settings.ALLOWED_EMAIL_DOMAINS)
-
-
-def login_view(request: HttpRequest) -> HttpResponse:
-    """Render the login form and handle OTP submission."""
-
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        email = request.POST.get("email", "").strip().lower()
-        otp = request.POST.get("otp", "").strip()
-
-        if not _allowed_email(email):
-            return render(request, "login.html", {"error": "Invalid email"})
-
-        totp = pyotp.TOTP(settings.OTP_SECRET)
-        if not totp.verify(otp, valid_window=1):
-            return render(request, "login.html", {"error": "Invalid OTP"})
-
-        request.session.update({"authenticated": True, "name": name, "email": email})
-        return redirect("dashboard")
-
-    return render(request, "login.html")
-
-
-@require_POST
-def auto_login(request: HttpRequest) -> HttpResponse:
-    """Authenticate using data stored in ``localStorage``."""
-
-    try:
-        data = json.loads(request.body.decode())
-    except json.JSONDecodeError:
-        return HttpResponse(status=400)
-
-    email = str(data.get("email", "")).lower()
-    name = str(data.get("name", "")).strip()
-    if _allowed_email(email):
-        request.session.update({"authenticated": True, "name": name, "email": email})
-        return HttpResponse("OK")
-
-    return HttpResponse(status=400)
 
 def logout_view(request: HttpRequest) -> HttpResponse:
     """Clear the session and redirect to login."""
@@ -103,7 +45,6 @@ def dashboard(request: HttpRequest) -> HttpResponse:
     return render(request, "dashboard.html", context)
 
 
-@_require_login
 def api_latest(request: HttpRequest) -> JsonResponse:
     """Return the most recent price snapshot, creating one if necessary."""
 
@@ -127,7 +68,6 @@ def api_latest(request: HttpRequest) -> JsonResponse:
     )
 
 
-@_require_login
 def api_opportunities(request: HttpRequest) -> JsonResponse:
     """Return recent logged opportunities."""
 
@@ -143,8 +83,6 @@ def api_opportunities(request: HttpRequest) -> JsonResponse:
     ]
     return JsonResponse(data, safe=False)
 
-
-@_require_login
 @require_POST
 def api_manual_sync(request: HttpRequest) -> JsonResponse:
     """Trigger an immediate price sync."""
@@ -153,7 +91,6 @@ def api_manual_sync(request: HttpRequest) -> JsonResponse:
     return JsonResponse({"status": "ok"})
 
 
-@_require_login
 @require_POST
 def api_rebalance(request: HttpRequest) -> JsonResponse:
     """Execute a rebalance action if a private key is configured."""

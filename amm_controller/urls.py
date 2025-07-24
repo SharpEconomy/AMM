@@ -20,9 +20,6 @@ from dashboard import views
 
 urlpatterns = [
     path("", views.dashboard, name="dashboard"),
-    path("login/", views.login_view, name="login"),
-    path("logout/", views.logout_view, name="logout"),
-    path("auto_login/", views.auto_login, name="auto_login"),
     path("api/latest/", views.api_latest, name="api_latest"),
     path("api/opportunities/", views.api_opportunities, name="api_opportunities"),
     path("api/manual_sync/", views.api_manual_sync, name="api_manual_sync"),

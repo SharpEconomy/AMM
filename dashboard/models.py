@@ -20,14 +20,3 @@ class OpportunityLog(models.Model):
 
     def __str__(self) -> str:
         return f"{self.timestamp:%Y-%m-%d %H:%M:%S} - {self.delta_percent:.2f}%"
-
-
-class DashboardUser(models.Model):
-    """Simple user store for Microsoft Authenticator-based logins."""
-
-    name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    otp_secret = models.CharField(max_length=32)
-
-    def __str__(self) -> str:
-        return self.email

@@ -25,13 +25,8 @@ The dashboard is available at `/` and provides a single-page interface for all
 features. Bitmart and Coinstore prices may show as `N/A` if their APIs are
 unreachable.
 
-## Authentication
-
-Only team members may access the dashboard. Authentication uses a team-wide
-OTP secret (``OTP_SECRET``) compatible with the **Microsoft Authenticator**
-app. On first visit enter your name, email and the current 6‑digit code. After
-logging in, the app stores the name and email in ``localStorage`` so subsequent
-visits automatically authenticate.
+Authentication has been removed; anyone with access to the app URL can view the
+dashboard.
 
 ## Deploying to Render
 
