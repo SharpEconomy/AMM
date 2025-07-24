@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "unsafe-secret-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = [] if DEBUG else os.environ.get("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = ['amm-eaf8.onrender.com'] if DEBUG else os.environ.get("ALLOWED_HOSTS", "").split(",")
 
 
 # Application definition
