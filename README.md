@@ -21,3 +21,19 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
 - `python manage.py start_scheduler` – run the scheduler alone.
 
 The dashboard is available at `/` and Django admin at `/admin/`.
+
+## Deploying to Render
+
+The included `render.yaml` defines a free web service. Create a new **Web Service**
+in Render using this repository and configure the following environment
+variables in the Render dashboard:
+
+- `DJANGO_SECRET_KEY` – your Django secret key
+- `ALCHEMY_URL` – Polygon RPC URL from Alchemy
+- `POOL_ADDRESS` – Uniswap V3 pool address
+- `PRIVATE_KEY` – optional wallet key for write actions
+- `PRICE_THRESHOLD` – optional percentage threshold (default `1.0`)
+- `RUN_SCHEDULER` – set to `1` to start the APScheduler in the web process
+
+Render will automatically install requirements, run migrations via the
+`preDeployCommand`, and start the app with Gunicorn.
