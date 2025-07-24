@@ -5,4 +5,4 @@ services:
   plan: free
   buildCommand: "pip install -r requirements.txt"
   startCommand: "gunicorn amm_controller.wsgi --workers 1 --log-file -"
-  preDeployCommand: "python manage.py migrate"
+  preDeployCommand: "python manage.py migrate && python manage.py collectstatic --noinput"
