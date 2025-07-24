@@ -7,13 +7,12 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .models import OpportunityLog, PriceSnapshot, DashboardUser
+from .models import OpportunityLog, PriceSnapshot
 from services.uniswap import get_pool_data
 from services.cex_price import get_average_price
 from jobs.sync import sync_prices
 
 
-@_require_login
 def dashboard(request: HttpRequest) -> HttpResponse:
     """Render dashboard page."""
     latest_snapshot = PriceSnapshot.objects.order_by("-timestamp").first()
