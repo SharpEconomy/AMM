@@ -33,6 +33,14 @@ codes that work with the **Microsoft Authenticator** app. New users should visit
 confirm the first 6‑digit code. After sign up or login, the app stores the name
 and email in `localStorage` so subsequent visits automatically authenticate.
 
+## Authentication
+
+Only team members may access the dashboard. On first visit, enter your name,
+email (must end with `@csharp.com` or `@sharpinnovation.foundation`) and the
+current 6-digit code from your authenticator app using the `OTP_SECRET`
+configured in the environment. Successful login stores the name and email in
+`localStorage` so subsequent visits skip the OTP step.
+
 ## Deploying to Render
 
 The included `render.yaml` defines a free web service. Create a new **Web Service**
@@ -46,6 +54,7 @@ variables in the Render dashboard:
 - `PRICE_THRESHOLD` – optional percentage threshold (default `1.0`)
 - `SYNC_INTERVAL_SECONDS` – how often to fetch prices (default `60`)
 - `RUN_SCHEDULER` – set to `1` to start the APScheduler in the web process
+- `OTP_SECRET` – base32 secret for TOTP login
 - `ALLOWED_HOSTS` – comma-separated list of allowed hosts (optional)
 - `RENDER_EXTERNAL_HOSTNAME` will be added automatically if provided by Render
 

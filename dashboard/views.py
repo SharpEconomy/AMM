@@ -85,7 +85,6 @@ def signup_view(request: HttpRequest) -> HttpResponse:
 
     return render(request, "signup.html")
 
-
 def login_view(request: HttpRequest) -> HttpResponse:
     """Render the login form and handle OTP submission."""
 
@@ -107,6 +106,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
             return render(request, "login.html", {"error": "Invalid OTP"})
 
         request.session.update({"authenticated": True, "name": user.name, "email": user.email})
+
         return redirect("dashboard")
 
     return render(request, "login.html")
@@ -131,7 +131,6 @@ def auto_login(request: HttpRequest) -> HttpResponse:
         return HttpResponse("OK")
 
     return HttpResponse(status=400)
-
 
 def logout_view(request: HttpRequest) -> HttpResponse:
     """Clear the session and redirect to login."""
