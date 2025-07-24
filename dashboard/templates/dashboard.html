@@ -57,6 +57,7 @@ function loadData(){
       document.getElementById('uni-price').innerText = data.uniswap_price != null ? data.uniswap_price.toFixed(6) : 'N/A';
       document.getElementById('bm-price').innerText = data.bitmart_price ?? 'N/A';
       document.getElementById('cs-price').innerText = data.coinstore_price ?? 'N/A';
+
       const ts = new Date(data.timestamp);
       document.getElementById('last-sync').innerText = ts.toLocaleString();
     })
@@ -70,6 +71,7 @@ function loadData(){
       tbody.innerHTML = '';
       rows.forEach(r=>{
           const tr = document.createElement('tr');
+
           const t = new Date(r.timestamp).toLocaleString();
           tr.innerHTML = `<td>${t}</td><td>${r.delta_percent.toFixed(2)}</td><td>${r.uniswap_price}</td><td>${r.average_price}</td>`;
           tbody.appendChild(tr);
