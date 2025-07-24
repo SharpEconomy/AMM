@@ -9,18 +9,20 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
    pip install -r requirements.txt
    ```
 2. Create a `.env` file and set the required variables (`ALCHEMY_URL`, `POOL_ADDRESS`, etc).
-3. Run migrations and start the scheduler:
+3. Start the development server. Pending migrations run automatically (set
+   `AUTO_MIGRATE=0` to disable):
    ```bash
-   python manage.py migrate
    RUN_SCHEDULER=1 python manage.py runserver
    ```
-   The scheduler runs in-process and syncs prices every minute.
+   The scheduler runs in-process and syncs prices every minute by default.
+   Set `SYNC_INTERVAL_SECONDS` to change the interval.
 
 ## Management Commands
 
 - `python manage.py start_scheduler` – run the scheduler alone.
 
 The dashboard is available at `/` and Django admin at `/admin/`.
+Bitmart and Coinstore prices may show as `N/A` if their APIs are unreachable.
 
 ## Deploying to Render
 
@@ -33,6 +35,7 @@ variables in the Render dashboard:
 - `POOL_ADDRESS` – Uniswap V3 pool address
 - `PRIVATE_KEY` – optional wallet key for write actions
 - `PRICE_THRESHOLD` – optional percentage threshold (default `1.0`)
+- `SYNC_INTERVAL_SECONDS` – how often to fetch prices (default `60`)
 - `RUN_SCHEDULER` – set to `1` to start the APScheduler in the web process
 - `ALLOWED_HOSTS` – comma-separated list of allowed hosts (optional)
 - `RENDER_EXTERNAL_HOSTNAME` will be added automatically if provided by Render

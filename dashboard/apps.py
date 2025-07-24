@@ -1,5 +1,7 @@
-from django.apps import AppConfig
+"""App configuration for the dashboard app."""
+
 import os
+from django.apps import AppConfig
 
 
 class DashboardConfig(AppConfig):

@@ -1,5 +1,10 @@
-from web3 import Web3
+"""Utilities for reading Uniswap V3 pool data."""
+
+from functools import lru_cache
 import os
+from typing import Dict
+
+from web3 import Web3
 
 ALCHEMY_URL = os.environ.get("ALCHEMY_URL")
 POOL_ADDRESS = Web3.to_checksum_address(os.environ.get("POOL_ADDRESS", "0x0000000000000000000000000000000000000000"))
@@ -28,11 +33,14 @@ POOL_ABI = [
 web3 = Web3(Web3.HTTPProvider(ALCHEMY_URL))
 
 
+@lru_cache(maxsize=1)
 def get_pool_contract():
+    """Return a cached contract instance for the configured pool."""
     return web3.eth.contract(address=POOL_ADDRESS, abi=POOL_ABI)
 
 
-def get_pool_data():
+def get_pool_data() -> Dict[str, int | float]:
+    """Return basic data from the pool contract."""
     contract = get_pool_contract()
     slot0 = contract.functions.slot0().call()
     liquidity = contract.functions.liquidity().call()
