@@ -21,8 +21,17 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
 
 - `python manage.py start_scheduler` – run the scheduler alone.
 
-The dashboard is available at `/` and Django admin at `/admin/`.
-Bitmart and Coinstore prices may show as `N/A` if their APIs are unreachable.
+The dashboard is available at `/` and provides a single-page interface for all
+features. Bitmart and Coinstore prices may show as `N/A` if their APIs are
+unreachable.
+
+## Authentication
+
+Only team members may access the dashboard. Authentication uses per-user TOTP
+codes that work with the **Microsoft Authenticator** app. New users should visit
+`/signup/` to generate a QR code, scan it with Microsoft Authenticator and
+confirm the first 6‑digit code. After sign up or login, the app stores the name
+and email in `localStorage` so subsequent visits automatically authenticate.
 
 ## Authentication
 

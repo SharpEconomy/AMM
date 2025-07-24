@@ -42,7 +42,6 @@ if external_host:
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -135,9 +134,6 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# OTP secret for login
-OTP_SECRET = os.environ.get("OTP_SECRET", "BASE32SECRET")
 
 # Allowed email domains for login
 ALLOWED_EMAIL_DOMAINS = ["csharp.com", "sharpinnovation.foundation"]
