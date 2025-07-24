@@ -32,7 +32,6 @@ unreachable.
 Authentication has been removed; anyone with access to the app URL can view the
 dashboard.
 
-
 ## Deploying to Render
 
 The included `render.yaml` defines a free web service. Create a new **Web Service**
@@ -42,10 +41,12 @@ variables in the Render dashboard:
 - `DJANGO_SECRET_KEY` – your Django secret key
 - `ALCHEMY_URL` – Polygon RPC URL from Alchemy
 - `POOL_ADDRESS` – Uniswap V3 pool address
+- `OTP_SECRET` – base32 secret for Microsoft Authenticator login
 - `PRIVATE_KEY` – optional wallet key for write actions
 - `PRICE_THRESHOLD` – optional percentage threshold (default `1.0`)
 - `SYNC_INTERVAL_SECONDS` – how often to fetch prices (default `60`)
 - `RUN_SCHEDULER` – set to `1` to start the APScheduler in the web process
+- `OTP_SECRET` – base32 secret for TOTP login
 - `ALLOWED_HOSTS` – comma-separated list of allowed hosts (optional)
 - `RENDER_EXTERNAL_HOSTNAME` will be added automatically if provided by Render
 

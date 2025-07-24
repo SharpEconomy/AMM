@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Signup Complete</title>
+    <script>
+        localStorage.setItem('userInfo', JSON.stringify({name: '{{ name|escapejs }}', email: '{{ email|escapejs }}'}));
+        window.location = '/';
+    </script>
+</head>
+<body></body>
+</html>
