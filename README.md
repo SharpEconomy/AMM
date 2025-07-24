@@ -8,7 +8,7 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
    ```bash
    pip install -r requirements.txt
    ```
-2. Copy `.env.example` to `.env` and fill in values (`ALCHEMY_URL`, `POOL_ADDRESS`, etc).
+2. Create a `.env` file and set the required variables (`ALCHEMY_URL`, `POOL_ADDRESS`, etc).
 3. Run migrations and start the scheduler:
    ```bash
    python manage.py migrate
