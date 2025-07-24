@@ -24,6 +24,14 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
 The dashboard is available at `/` and Django admin at `/admin/`.
 Bitmart and Coinstore prices may show as `N/A` if their APIs are unreachable.
 
+## Authentication
+
+Only team members may access the dashboard. On first visit, enter your name,
+email (must end with `@csharp.com` or `@sharpinnovation.foundation`) and the
+current 6-digit code from your authenticator app using the `OTP_SECRET`
+configured in the environment. Successful login stores the name and email in
+`localStorage` so subsequent visits skip the OTP step.
+
 ## Deploying to Render
 
 The included `render.yaml` defines a free web service. Create a new **Web Service**
@@ -37,6 +45,7 @@ variables in the Render dashboard:
 - `PRICE_THRESHOLD` – optional percentage threshold (default `1.0`)
 - `SYNC_INTERVAL_SECONDS` – how often to fetch prices (default `60`)
 - `RUN_SCHEDULER` – set to `1` to start the APScheduler in the web process
+- `OTP_SECRET` – base32 secret for TOTP login
 - `ALLOWED_HOSTS` – comma-separated list of allowed hosts (optional)
 - `RENDER_EXTERNAL_HOSTNAME` will be added automatically if provided by Render
 
