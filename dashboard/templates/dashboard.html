@@ -51,34 +51,53 @@
 <script>
 
 function loadData(){
-  fetch('/api/latest/').then(r=>r.json()).then(data=>{
-    document.getElementById('uni-price').innerText = data.uniswap_price != null ? data.uniswap_price.toFixed(6) : 'N/A';
-    document.getElementById('bm-price').innerText = data.bitmart_price ?? 'N/A';
-    document.getElementById('cs-price').innerText = data.coinstore_price ?? 'N/A';
-    document.getElementById('last-sync').innerText = data.timestamp;
-  });
-  fetch('/api/opportunities/').then(r=>r.json()).then(rows=>{
-    const tbody = document.querySelector('#log-table tbody');
-    tbody.innerHTML = '';
-    rows.forEach(r=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${r.timestamp}</td><td>${r.delta_percent.toFixed(2)}</td><td>${r.uniswap_price}</td><td>${r.average_price}</td>`;
-        tbody.appendChild(tr);
+  fetch('/api/latest/')
+    .then(r=>r.json())
+    .then(data=>{
+      document.getElementById('uni-price').innerText = data.uniswap_price != null ? data.uniswap_price.toFixed(6) : 'N/A';
+      document.getElementById('bm-price').innerText = data.bitmart_price ?? 'N/A';
+      document.getElementById('cs-price').innerText = data.coinstore_price ?? 'N/A';
+      document.getElementById('last-sync').innerText = data.timestamp;
+    })
+    .catch(err=>{
+      console.error('Failed to load latest:', err);
     });
-  });
+  fetch('/api/opportunities/')
+    .then(r=>r.json())
+    .then(rows=>{
+      const tbody = document.querySelector('#log-table tbody');
+      tbody.innerHTML = '';
+      rows.forEach(r=>{
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${r.timestamp}</td><td>${r.delta_percent.toFixed(2)}</td><td>${r.uniswap_price}</td><td>${r.average_price}</td>`;
+          tbody.appendChild(tr);
+      });
+    })
+    .catch(err=>{
+      console.error('Failed to load opportunities:', err);
+    });
 }
 
 loadData();
 setInterval(loadData, 60000);
 
 document.getElementById('sync-btn').onclick = ()=>{
-  fetch('/api/manual_sync/', {method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'}}).then(loadData);
+  fetch('/api/manual_sync/', {method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'}})
+    .then(()=>{
+      console.log('Manual sync triggered');
+      loadData();
+    })
+    .catch(err=>console.error('Manual sync failed:', err));
 };
 
 document.getElementById('rebalance-btn').onclick = ()=>{
-  fetch('/api/rebalance/', {method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'}}).then(r=>r.json()).then(res=>{
+  fetch('/api/rebalance/', {method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}'}})
+    .then(r=>r.json())
+    .then(res=>{
       document.getElementById('rebalance-msg').innerText = res.message;
-  });
+      console.log('Rebalance response:', res);
+    })
+    .catch(err=>console.error('Rebalance request failed:', err));
 };
 </script>
 </body>
