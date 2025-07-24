@@ -29,8 +29,15 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "unsafe-secret-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = [os.environ.get("ALLOWED_HOSTS", "").split(",")] 
+ALLOWED_HOSTS: list[str] = []
 
+if not DEBUG:
+    env_hosts = os.environ.get("ALLOWED_HOSTS", "")
+    ALLOWED_HOSTS = [h.strip() for h in env_hosts.split(",") if h.strip()]
+
+external_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if external_host:
+    ALLOWED_HOSTS.append(external_host)
 
 # Application definition
 
