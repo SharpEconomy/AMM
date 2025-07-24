@@ -117,3 +117,9 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Allowed email domains for login
+ALLOWED_EMAIL_DOMAINS = ["csharp.com", "sharpinnovation.foundation"]
+
+# OTP secret for Microsoft Authenticator
+OTP_SECRET = os.environ.get("OTP_SECRET", "")
