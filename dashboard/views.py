@@ -1,11 +1,16 @@
+"""Views for the simple monitoring dashboard."""
+
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
-from .models import PriceSnapshot, OpportunityLog
+
+from .models import OpportunityLog, PriceSnapshot
 from services.uniswap import get_pool_data
 from services.cex_price import get_average_price
 
 
-def dashboard(request):
+def dashboard(request: HttpRequest) -> HttpResponse:
+    """Render the dashboard with the latest price snapshot."""
     latest_snapshot = PriceSnapshot.objects.order_by("-timestamp").first()
     opportunities = OpportunityLog.objects.order_by("-timestamp")[:20]
     if not latest_snapshot:
