@@ -1,7 +1,6 @@
 """Views for the monitoring dashboard."""
 
 from __future__ import annotations
-
 import os
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -14,27 +13,29 @@ from services.cex_price import get_average_price
 from jobs.sync import sync_prices
 
 
-def logout_view(request: HttpRequest) -> HttpResponse:
-    """Clear the session and redirect to login."""
-
-    request.session.flush()
-    return redirect("login")
-
-
 @_require_login
 def dashboard(request: HttpRequest) -> HttpResponse:
     """Render dashboard page."""
     latest_snapshot = PriceSnapshot.objects.order_by("-timestamp").first()
     opportunities = OpportunityLog.objects.order_by("-timestamp")[:20]
     if not latest_snapshot:
-        uni_data = get_pool_data()
-        avg, bm, cs = get_average_price()
-        latest_snapshot = PriceSnapshot(
-            timestamp=timezone.now(),
-            uniswap_price=uni_data["price"],
-            bitmart_price=bm,
-            coinstore_price=cs,
-        )
+        try:
+            uni_data = get_pool_data()
+            avg, bm, cs = get_average_price()
+            latest_snapshot = PriceSnapshot(
+                timestamp=timezone.now(),
+                uniswap_price=uni_data["price"],
+                bitmart_price=bm,
+                coinstore_price=cs,
+            )
+        except Exception as exc:  # pragma: no cover - external
+            logging.warning("Failed to fetch initial data: %s", exc)
+            latest_snapshot = PriceSnapshot(
+                timestamp=timezone.now(),
+                uniswap_price=0,
+                bitmart_price=None,
+                coinstore_price=None,
+            )
     context = {
         "snapshot": latest_snapshot,
         "opportunities": opportunities,
@@ -47,14 +48,23 @@ def api_latest(request: HttpRequest) -> JsonResponse:
 
     snap = PriceSnapshot.objects.order_by("-timestamp").first()
     if not snap:
-        uni_data = get_pool_data()
-        _, bm, cs = get_average_price()
-        snap = PriceSnapshot.objects.create(
-            timestamp=timezone.now(),
-            uniswap_price=uni_data["price"],
-            bitmart_price=bm,
-            coinstore_price=cs,
-        )
+        try:
+            uni_data = get_pool_data()
+            _, bm, cs = get_average_price()
+            snap = PriceSnapshot.objects.create(
+                timestamp=timezone.now(),
+                uniswap_price=uni_data["price"],
+                bitmart_price=bm,
+                coinstore_price=cs,
+            )
+        except Exception as exc:  # pragma: no cover - external
+            logging.warning("Failed to create snapshot: %s", exc)
+            snap = PriceSnapshot.objects.create(
+                timestamp=timezone.now(),
+                uniswap_price=0,
+                bitmart_price=None,
+                coinstore_price=None,
+            )
     return JsonResponse(
         {
             "timestamp": snap.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
@@ -84,7 +94,10 @@ def api_opportunities(request: HttpRequest) -> JsonResponse:
 def api_manual_sync(request: HttpRequest) -> JsonResponse:
     """Trigger an immediate price sync."""
 
-    sync_prices()
+    try:
+        sync_prices()
+    except Exception as exc:  # pragma: no cover - external
+        logging.warning("Manual sync failed: %s", exc)
     return JsonResponse({"status": "ok"})
 
 
@@ -95,4 +108,5 @@ def api_rebalance(request: HttpRequest) -> JsonResponse:
     if not os.environ.get("PRIVATE_KEY"):
         return JsonResponse({"message": "Read-only mode"})
     # Placeholder for actual contract interaction
+    logging.info("Rebalance triggered by user")
     return JsonResponse({"message": "Rebalance executed"})

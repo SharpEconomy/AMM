@@ -1,6 +1,9 @@
-"""Helpers for fetching CEX prices."""
+"""Helpers for fetching SHARP/USDT prices from centralized exchanges."""
+
+from __future__ import annotations
 
 import json
+import logging
 from typing import Optional, Tuple
 
 import requests
@@ -10,15 +13,14 @@ COINSTORE_URL = "https://api.coinstore.com/api/v1/ticker?symbol=SHARPUSDT"
 
 
 def _safe_request(url: str) -> Optional[str]:
+    """Return response text or ``None`` and log failures."""
     try:
         resp = requests.get(url, timeout=10)
         resp.raise_for_status()
         return resp.text
-    except requests.RequestException:
+    except requests.RequestException as exc:  # pragma: no cover - network
+        logging.warning("Request failed for %s: %s", url, exc)
         return None
-
-BITMART_URL = "https://api-cloud.bitmart.com/spot/quotation/v3/tickers?symbol=SHARP_USDT"
-COINSTORE_URL = "https://api.coinstore.com/api/v1/ticker?symbol=SHARPUSDT"
 
 def fetch_bitmart_price() -> Optional[float]:
     """Return the latest Bitmart price or ``None`` on failure."""
@@ -34,15 +36,14 @@ def fetch_bitmart_price() -> Optional[float]:
             ticker = tickers[0]
             if isinstance(ticker, dict) and "last_price" in ticker:
                 return float(ticker["last_price"])
-    except (ValueError, json.JSONDecodeError, TypeError):
-        pass
+    except (ValueError, json.JSONDecodeError, TypeError) as exc:
+        logging.warning("Failed to parse Bitmart response: %s", exc)
     return None
 
 def fetch_coinstore_price() -> Optional[float]:
     """Return the latest Coinstore price or ``None`` on failure."""
     text = _safe_request(COINSTORE_URL)
     if not text:
-
         return None
     try:
         data = json.loads(text)
@@ -53,8 +54,8 @@ def fetch_coinstore_price() -> Optional[float]:
                 price = inner["last"]
         if price is not None:
             return float(price)
-    except (ValueError, json.JSONDecodeError, TypeError):
-        pass
+    except (ValueError, json.JSONDecodeError, TypeError) as exc:
+        logging.warning("Failed to parse Coinstore response: %s", exc)
     return None
 
 
@@ -66,3 +67,4 @@ def get_average_price() -> Tuple[Optional[float], Optional[float], Optional[floa
     if not prices:
         return None, bm, cs
     return sum(prices) / len(prices), bm, cs
+

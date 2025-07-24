@@ -9,6 +9,8 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
    pip install -r requirements.txt
    ```
 2. Create a `.env` file and set the required variables (`ALCHEMY_URL`, `POOL_ADDRESS`, etc).
+   Without a valid `ALCHEMY_URL` or outbound internet access the live prices will
+   show as `N/A`.
 3. Start the development server. Pending migrations run automatically (set
    `AUTO_MIGRATE=0` to disable):
    ```bash
@@ -27,7 +29,7 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
 
 The dashboard is available at `/` and provides a single-page interface for all
 features. Bitmart and Coinstore prices may show as `N/A` if their APIs are
-unreachable.
+unreachable. Uniswap data likewise requires `ALCHEMY_URL` to be set correctly.
 
 Authentication has been removed; anyone with access to the app URL can view the
 dashboard.

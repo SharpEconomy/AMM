@@ -1,13 +1,18 @@
 """Utilities for reading Uniswap V3 pool data."""
 
+from __future__ import annotations
+
 from functools import lru_cache
+import logging
 import os
-from typing import Dict
+from typing import Dict, Optional
 
 from web3 import Web3
 
 ALCHEMY_URL = os.environ.get("ALCHEMY_URL")
-POOL_ADDRESS = Web3.to_checksum_address(os.environ.get("POOL_ADDRESS", "0x0000000000000000000000000000000000000000"))
+POOL_ADDRESS = os.environ.get("POOL_ADDRESS")
+if POOL_ADDRESS:
+    POOL_ADDRESS = Web3.to_checksum_address(POOL_ADDRESS)
 
 POOL_ABI = [
     {
@@ -30,27 +35,38 @@ POOL_ABI = [
 ]
 
 
-web3 = Web3(Web3.HTTPProvider(ALCHEMY_URL))
+web3: Optional[Web3] = None
+if ALCHEMY_URL:
+    web3 = Web3(Web3.HTTPProvider(ALCHEMY_URL))
+else:  # pragma: no cover - runtime check
+    logging.warning("ALCHEMY_URL not configured; Uniswap data disabled")
 
 
 @lru_cache(maxsize=1)
 def get_pool_contract():
     """Return a cached contract instance for the configured pool."""
+    if not web3 or not POOL_ADDRESS:
+        raise RuntimeError("Uniswap configuration missing")
     return web3.eth.contract(address=POOL_ADDRESS, abi=POOL_ABI)
 
 
 def get_pool_data() -> Dict[str, int | float]:
     """Return basic data from the pool contract."""
-    contract = get_pool_contract()
-    slot0 = contract.functions.slot0().call()
-    liquidity = contract.functions.liquidity().call()
-    fee = contract.functions.fee().call()
-    sqrt_price_x96 = slot0[0]
-    tick = slot0[1]
-    price = (sqrt_price_x96 / (2**96))**2
-    return {
-        "price": price,
-        "tick": tick,
-        "liquidity": liquidity,
-        "fee": fee,
-    }
+    try:
+        contract = get_pool_contract()
+        slot0 = contract.functions.slot0().call()
+        liquidity = contract.functions.liquidity().call()
+        fee = contract.functions.fee().call()
+        sqrt_price_x96 = slot0[0]
+        tick = slot0[1]
+        price = (sqrt_price_x96 / (2**96))**2
+        return {
+            "price": price,
+            "tick": tick,
+            "liquidity": liquidity,
+            "fee": fee,
+        }
+    except Exception as exc:  # pragma: no cover - external call
+        logging.warning("Failed to fetch Uniswap data: %s", exc)
+        return {"price": 0.0, "tick": 0, "liquidity": 0, "fee": 0}
+
