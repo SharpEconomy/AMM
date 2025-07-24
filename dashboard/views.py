@@ -7,7 +7,6 @@ import os
 from functools import wraps
 from typing import Any, Callable
 
-
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
@@ -15,7 +14,7 @@ from django.views.decorators.http import require_POST
 
 from amm_controller import settings
 
-from .models import OpportunityLog, PriceSnapshot
+from .models import OpportunityLog, PriceSnapshot, DashboardUser
 from services.uniswap import get_pool_data
 from services.cex_price import get_average_price
 from jobs.sync import sync_prices
@@ -36,8 +35,6 @@ def _require_login(view: Callable[[HttpRequest], Any]) -> Callable[[HttpRequest]
 
 def _allowed_email(email: str) -> bool:
     return any(email.endswith("@" + d) for d in settings.ALLOWED_EMAIL_DOMAINS)
-
-
 
 
 def login_view(request: HttpRequest) -> HttpResponse:
@@ -77,7 +74,6 @@ def auto_login(request: HttpRequest) -> HttpResponse:
         return HttpResponse("OK")
 
     return HttpResponse(status=400)
-
 
 def logout_view(request: HttpRequest) -> HttpResponse:
     """Clear the session and redirect to login."""
