@@ -8,6 +8,7 @@ import requests
 BITMART_URL = "https://api-cloud.bitmart.com/spot/quotation/v3/tickers?symbol=SHARP_USDT"
 COINSTORE_URL = "https://api.coinstore.com/api/v1/ticker?symbol=SHARPUSDT"
 
+
 def _safe_request(url: str) -> Optional[str]:
     try:
         resp = requests.get(url, timeout=10)
@@ -16,6 +17,8 @@ def _safe_request(url: str) -> Optional[str]:
     except requests.RequestException:
         return None
 
+BITMART_URL = "https://api-cloud.bitmart.com/spot/quotation/v3/tickers?symbol=SHARP_USDT"
+COINSTORE_URL = "https://api.coinstore.com/api/v1/ticker?symbol=SHARPUSDT"
 
 def fetch_bitmart_price() -> Optional[float]:
     """Return the latest Bitmart price or ``None`` on failure."""
@@ -24,21 +27,35 @@ def fetch_bitmart_price() -> Optional[float]:
         return None
     try:
         data = json.loads(text)
-        ticker = data["data"]["tickers"][0]
-        return float(ticker["last_price"])
-    except (KeyError, ValueError, IndexError, json.JSONDecodeError):
-        return None
+        tickers = data.get("data")
+        if isinstance(tickers, dict):
+            tickers = tickers.get("tickers")
+        if isinstance(tickers, list) and tickers:
+            ticker = tickers[0]
+            if isinstance(ticker, dict) and "last_price" in ticker:
+                return float(ticker["last_price"])
+    except (ValueError, json.JSONDecodeError, TypeError):
+        pass
+    return None
 
 def fetch_coinstore_price() -> Optional[float]:
     """Return the latest Coinstore price or ``None`` on failure."""
     text = _safe_request(COINSTORE_URL)
     if not text:
-      return None
+
+        return None
     try:
         data = json.loads(text)
-        return float(data["data"]["last"])
-    except (KeyError, ValueError, json.JSONDecodeError):
-        return None
+        price = None
+        if isinstance(data, dict):
+            inner = data.get("data")
+            if isinstance(inner, dict) and "last" in inner:
+                price = inner["last"]
+        if price is not None:
+            return float(price)
+    except (ValueError, json.JSONDecodeError, TypeError):
+        pass
+    return None
 
 
 def get_average_price() -> Tuple[Optional[float], Optional[float], Optional[float]]:
