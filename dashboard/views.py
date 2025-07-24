@@ -2,20 +2,17 @@
 
 from __future__ import annotations
 
-import json
 import os
-
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from amm_controller import settings
-
 from .models import OpportunityLog, PriceSnapshot, DashboardUser
 from services.uniswap import get_pool_data
 from services.cex_price import get_average_price
 from jobs.sync import sync_prices
+
 
 def logout_view(request: HttpRequest) -> HttpResponse:
     """Clear the session and redirect to login."""

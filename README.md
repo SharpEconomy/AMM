@@ -16,6 +16,10 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
    ```
    The scheduler runs in-process and syncs prices every minute by default.
    Set `SYNC_INTERVAL_SECONDS` to change the interval.
+4. Before deploying, collect static files:
+   ```bash
+   python manage.py collectstatic --noinput
+   ```
 
 ## Management Commands
 
@@ -46,5 +50,5 @@ variables in the Render dashboard:
 - `ALLOWED_HOSTS` – comma-separated list of allowed hosts (optional)
 - `RENDER_EXTERNAL_HOSTNAME` will be added automatically if provided by Render
 
-Render will automatically install requirements, run migrations via the
-`preDeployCommand`, and start the app with Gunicorn.
+Render will automatically install requirements, run migrations and collect
+static files via the `preDeployCommand`, and start the app with Gunicorn.
