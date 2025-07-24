@@ -34,6 +34,8 @@ variables in the Render dashboard:
 - `PRIVATE_KEY` – optional wallet key for write actions
 - `PRICE_THRESHOLD` – optional percentage threshold (default `1.0`)
 - `RUN_SCHEDULER` – set to `1` to start the APScheduler in the web process
+- `ALLOWED_HOSTS` – comma-separated list of allowed hosts (optional)
+- `RENDER_EXTERNAL_HOSTNAME` will be added automatically if provided by Render
 
 Render will automatically install requirements, run migrations via the
 `preDeployCommand`, and start the app with Gunicorn.
