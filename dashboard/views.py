@@ -1,6 +1,8 @@
 """Views for the monitoring dashboard."""
 
 from __future__ import annotations
+
+import logging
 import os
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
