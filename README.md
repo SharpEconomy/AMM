@@ -21,8 +21,13 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
 
 - `python manage.py start_scheduler` – run the scheduler alone.
 
-The dashboard is available at `/` and Django admin at `/admin/`.
-Bitmart and Coinstore prices may show as `N/A` if their APIs are unreachable.
+The dashboard is available at `/` and provides a single-page interface for all
+features. Bitmart and Coinstore prices may show as `N/A` if their APIs are
+unreachable.
+
+Authentication has been removed; anyone with access to the app URL can view the
+dashboard.
+
 
 ## Deploying to Render
 
