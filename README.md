@@ -21,8 +21,17 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
 
 - `python manage.py start_scheduler` – run the scheduler alone.
 
-The dashboard is available at `/` and Django admin at `/admin/`.
-Bitmart and Coinstore prices may show as `N/A` if their APIs are unreachable.
+The dashboard is available at `/` and provides a single-page interface for all
+features. Bitmart and Coinstore prices may show as `N/A` if their APIs are
+unreachable.
+
+## Authentication
+
+Only team members may access the dashboard. Authentication uses a team-wide
+OTP secret (``OTP_SECRET``) compatible with the **Microsoft Authenticator**
+app. On first visit enter your name, email and the current 6‑digit code. After
+logging in, the app stores the name and email in ``localStorage`` so subsequent
+visits automatically authenticate.
 
 ## Deploying to Render
 
@@ -33,6 +42,7 @@ variables in the Render dashboard:
 - `DJANGO_SECRET_KEY` – your Django secret key
 - `ALCHEMY_URL` – Polygon RPC URL from Alchemy
 - `POOL_ADDRESS` – Uniswap V3 pool address
+- `OTP_SECRET` – base32 secret for Microsoft Authenticator login
 - `PRIVATE_KEY` – optional wallet key for write actions
 - `PRICE_THRESHOLD` – optional percentage threshold (default `1.0`)
 - `SYNC_INTERVAL_SECONDS` – how often to fetch prices (default `60`)
