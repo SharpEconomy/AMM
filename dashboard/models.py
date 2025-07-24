@@ -20,5 +20,3 @@ class OpportunityLog(models.Model):
 
     def __str__(self) -> str:
         return f"{self.timestamp:%Y-%m-%d %H:%M:%S} - {self.delta_percent:.2f}%"
-
-
