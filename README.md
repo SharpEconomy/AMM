@@ -27,19 +27,11 @@ unreachable.
 
 ## Authentication
 
-Only team members may access the dashboard. Authentication uses per-user TOTP
-codes that work with the **Microsoft Authenticator** app. New users should visit
-`/signup/` to generate a QR code, scan it with Microsoft Authenticator and
-confirm the first 6‑digit code. After sign up or login, the app stores the name
-and email in `localStorage` so subsequent visits automatically authenticate.
-
-## Authentication
-
-Only team members may access the dashboard. On first visit, enter your name,
-email (must end with `@csharp.com` or `@sharpinnovation.foundation`) and the
-current 6-digit code from your authenticator app using the `OTP_SECRET`
-configured in the environment. Successful login stores the name and email in
-`localStorage` so subsequent visits skip the OTP step.
+Only team members may access the dashboard. Authentication uses a team-wide
+OTP secret (``OTP_SECRET``) compatible with the **Microsoft Authenticator**
+app. On first visit enter your name, email and the current 6‑digit code. After
+logging in, the app stores the name and email in ``localStorage`` so subsequent
+visits automatically authenticate.
 
 ## Deploying to Render
 
@@ -50,6 +42,7 @@ variables in the Render dashboard:
 - `DJANGO_SECRET_KEY` – your Django secret key
 - `ALCHEMY_URL` – Polygon RPC URL from Alchemy
 - `POOL_ADDRESS` – Uniswap V3 pool address
+- `OTP_SECRET` – base32 secret for Microsoft Authenticator login
 - `PRIVATE_KEY` – optional wallet key for write actions
 - `PRICE_THRESHOLD` – optional percentage threshold (default `1.0`)
 - `SYNC_INTERVAL_SECONDS` – how often to fetch prices (default `60`)
