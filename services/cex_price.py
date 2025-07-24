@@ -17,6 +17,8 @@ def _safe_request(url: str) -> Optional[str]:
     except requests.RequestException:
         return None
 
+BITMART_URL = "https://api-cloud.bitmart.com/spot/quotation/v3/tickers?symbol=SHARP_USDT"
+COINSTORE_URL = "https://api.coinstore.com/api/v1/ticker?symbol=SHARPUSDT"
 
 def fetch_bitmart_price() -> Optional[float]:
     """Return the latest Bitmart price or ``None`` on failure."""
@@ -36,11 +38,11 @@ def fetch_bitmart_price() -> Optional[float]:
         pass
     return None
 
-
 def fetch_coinstore_price() -> Optional[float]:
     """Return the latest Coinstore price or ``None`` on failure."""
     text = _safe_request(COINSTORE_URL)
     if not text:
+
         return None
     try:
         data = json.loads(text)
