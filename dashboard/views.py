@@ -1,19 +1,20 @@
 """Views for the monitoring dashboard."""
 
 from __future__ import annotations
+
+import logging
 import os
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .models import OpportunityLog, PriceSnapshot, DashboardUser
+from .models import OpportunityLog, PriceSnapshot
 from services.uniswap import get_pool_data
 from services.cex_price import get_average_price
 from jobs.sync import sync_prices
 
 
-@_require_login
 def dashboard(request: HttpRequest) -> HttpResponse:
     """Render dashboard page."""
     latest_snapshot = PriceSnapshot.objects.order_by("-timestamp").first()
@@ -67,7 +68,7 @@ def api_latest(request: HttpRequest) -> JsonResponse:
             )
     return JsonResponse(
         {
-            "timestamp": snap.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "timestamp": snap.timestamp.isoformat(),
             "uniswap_price": snap.uniswap_price,
             "bitmart_price": snap.bitmart_price,
             "coinstore_price": snap.coinstore_price,
@@ -81,7 +82,7 @@ def api_opportunities(request: HttpRequest) -> JsonResponse:
     ops = OpportunityLog.objects.order_by("-timestamp")[:20]
     data = [
         {
-            "timestamp": o.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "timestamp": o.timestamp.isoformat(),
             "delta_percent": o.delta_percent,
             "uniswap_price": o.uniswap_price,
             "average_price": o.average_price,
