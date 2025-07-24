@@ -1,0 +1,48 @@
+from web3 import Web3
+import os
+
+ALCHEMY_URL = os.environ.get("ALCHEMY_URL")
+POOL_ADDRESS = Web3.to_checksum_address(os.environ.get("POOL_ADDRESS", "0x0000000000000000000000000000000000000000"))
+
+POOL_ABI = [
+    {
+        "inputs": [],
+        "name": "slot0",
+        "outputs": [
+            {"internalType": "uint160", "name": "sqrtPriceX96", "type": "uint160"},
+            {"internalType": "int24", "name": "tick", "type": "int24"},
+            {"internalType": "uint16", "name": "observationIndex", "type": "uint16"},
+            {"internalType": "uint16", "name": "observationCardinality", "type": "uint16"},
+            {"internalType": "uint16", "name": "observationCardinalityNext", "type": "uint16"},
+            {"internalType": "uint8", "name": "feeProtocol", "type": "uint8"},
+            {"internalType": "bool", "name": "unlocked", "type": "bool"}
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {"inputs": [], "name": "liquidity", "outputs": [{"internalType": "uint128", "name": "", "type": "uint128"}], "stateMutability": "view", "type": "function"},
+    {"inputs": [], "name": "fee", "outputs": [{"internalType": "uint24", "name": "", "type": "uint24"}], "stateMutability": "view", "type": "function"}
+]
+
+
+web3 = Web3(Web3.HTTPProvider(ALCHEMY_URL))
+
+
+def get_pool_contract():
+    return web3.eth.contract(address=POOL_ADDRESS, abi=POOL_ABI)
+
+
+def get_pool_data():
+    contract = get_pool_contract()
+    slot0 = contract.functions.slot0().call()
+    liquidity = contract.functions.liquidity().call()
+    fee = contract.functions.fee().call()
+    sqrt_price_x96 = slot0[0]
+    tick = slot0[1]
+    price = (sqrt_price_x96 / (2**96))**2
+    return {
+        "price": price,
+        "tick": tick,
+        "liquidity": liquidity,
+        "fee": fee,
+    }
