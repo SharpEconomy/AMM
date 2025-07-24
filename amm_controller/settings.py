@@ -39,7 +39,6 @@ external_host = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
 if external_host:
     ALLOWED_HOSTS.append(external_host)
 
-
 # Application definition
 
 INSTALLED_APPS = [

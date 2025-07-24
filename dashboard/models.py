@@ -10,7 +10,6 @@ class PriceSnapshot(models.Model):
     def __str__(self) -> str:
         return f"{self.timestamp:%Y-%m-%d %H:%M:%S} - {self.uniswap_price}" 
 
-
 class OpportunityLog(models.Model):
     timestamp = models.DateTimeField()
     delta_percent = models.FloatField()
