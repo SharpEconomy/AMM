@@ -4,3 +4,6 @@ requests
 apscheduler
 python-dotenv
 gunicorn
+pyotp
+whitenoise
+qrcode[pil]
