@@ -68,7 +68,7 @@ def api_latest(request: HttpRequest) -> JsonResponse:
             )
     return JsonResponse(
         {
-            "timestamp": snap.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "timestamp": snap.timestamp.isoformat(),
             "uniswap_price": snap.uniswap_price,
             "bitmart_price": snap.bitmart_price,
             "coinstore_price": snap.coinstore_price,
@@ -82,7 +82,7 @@ def api_opportunities(request: HttpRequest) -> JsonResponse:
     ops = OpportunityLog.objects.order_by("-timestamp")[:20]
     data = [
         {
-            "timestamp": o.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "timestamp": o.timestamp.isoformat(),
             "delta_percent": o.delta_percent,
             "uniswap_price": o.uniswap_price,
             "average_price": o.average_price,
