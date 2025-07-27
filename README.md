@@ -8,6 +8,7 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
    ```bash
    pip install -r requirements.txt
    ```
+
 2. Create a `.env` file and set the required variables (`POOL_ADDRESS`, etc).
    The app queries the Uniswap V3 API directly and no RPC provider is needed.
    Without network access the live prices will show as `N/A`.

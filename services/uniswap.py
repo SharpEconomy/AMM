@@ -25,7 +25,6 @@ query ($id: ID!) {
 }
 """
 
-
 def get_pool_data() -> Dict[str, int | float]:
     """Return basic data from the Uniswap API."""
     if not POOL_ADDRESS:
