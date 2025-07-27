@@ -9,7 +9,7 @@ from typing import Dict, Optional
 
 from web3 import Web3
 
-ALCHEMY_URL = os.environ.get("ALCHEMY_URL")
+RPC_URL = os.environ.get("RPC_URL") or os.environ.get("ALCHEMY_URL")
 POOL_ADDRESS = os.environ.get("POOL_ADDRESS")
 if POOL_ADDRESS:
     POOL_ADDRESS = Web3.to_checksum_address(POOL_ADDRESS)
@@ -36,10 +36,10 @@ POOL_ABI = [
 
 
 web3: Optional[Web3] = None
-if ALCHEMY_URL:
-    web3 = Web3(Web3.HTTPProvider(ALCHEMY_URL))
+if RPC_URL:
+    web3 = Web3(Web3.HTTPProvider(RPC_URL))
 else:  # pragma: no cover - runtime check
-    logging.warning("ALCHEMY_URL not configured; Uniswap data disabled")
+    logging.warning("RPC_URL not configured; Uniswap data disabled")
 
 
 @lru_cache(maxsize=1)
