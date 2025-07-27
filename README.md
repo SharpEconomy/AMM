@@ -8,8 +8,9 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
    ```bash
    pip install -r requirements.txt
    ```
-2. Create a `.env` file and set the required variables (`ALCHEMY_URL`, `POOL_ADDRESS`, etc).
-   Without a valid `ALCHEMY_URL` or outbound internet access the live prices will
+2. Create a `.env` file and set the required variables (`RPC_URL`, `POOL_ADDRESS`, etc).
+   `RPC_URL` should point to any Polygon RPC provider (Alchemy, Infura, etc).
+   Without a valid RPC URL or outbound internet access the live prices will
    show as `N/A`.
 3. Start the development server. Pending migrations run automatically (set
    `AUTO_MIGRATE=0` to disable):
@@ -29,7 +30,8 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
 
 The dashboard is available at `/` and provides a single-page interface for all
 features. Bitmart and Coinstore prices may show as `N/A` if their APIs are
-unreachable. Uniswap data likewise requires `ALCHEMY_URL` to be set correctly.
+unreachable. Uniswap data likewise requires a valid RPC URL to be set
+correctly.
 
 Authentication has been removed; anyone with access to the app URL can view the
 dashboard.
@@ -41,7 +43,7 @@ in Render using this repository and configure the following environment
 variables in the Render dashboard:
 
 - `DJANGO_SECRET_KEY` – your Django secret key
-- `ALCHEMY_URL` – Polygon RPC URL from Alchemy
+- `RPC_URL` – Polygon RPC URL (Alchemy, Infura, etc.)
 - `POOL_ADDRESS` – Uniswap V3 pool address
 - `OTP_SECRET` – base32 secret for Microsoft Authenticator login
 - `PRIVATE_KEY` – optional wallet key for write actions
