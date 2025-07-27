@@ -11,7 +11,11 @@ from django.views.decorators.http import require_POST
 
 from .models import OpportunityLog, PriceSnapshot
 from services.uniswap import get_pool_data
-from services.cex_price import get_average_price
+from services.cex_price import (
+    fetch_bitmart_price,
+    fetch_coinstore_price,
+    get_average_price,
+)
 from jobs.sync import sync_prices
 
 
@@ -111,3 +115,17 @@ def api_rebalance(request: HttpRequest) -> JsonResponse:
     # Placeholder for actual contract interaction
     logging.info("Rebalance triggered by user")
     return JsonResponse({"message": "Rebalance executed"})
+
+
+def api_bitmart_price(request: HttpRequest) -> JsonResponse:
+    """Return the current Bitmart SHARP/USDT price."""
+
+    price = fetch_bitmart_price()
+    return JsonResponse({"price": price})
+
+
+def api_coinstore_price(request: HttpRequest) -> JsonResponse:
+    """Return the current Coinstore SHARP/USDT price."""
+
+    price = fetch_coinstore_price()
+    return JsonResponse({"price": price})
