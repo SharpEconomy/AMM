@@ -24,4 +24,14 @@ urlpatterns = [
     path("api/opportunities/", views.api_opportunities, name="api_opportunities"),
     path("api/manual_sync/", views.api_manual_sync, name="api_manual_sync"),
     path("api/rebalance/", views.api_rebalance, name="api_rebalance"),
+    path(
+        "api/bitmart_price/",
+        views.api_bitmart_price,
+        name="api_bitmart_price",
+    ),
+    path(
+        "api/coinstore_price/",
+        views.api_coinstore_price,
+        name="api_coinstore_price",
+    ),
 ]
