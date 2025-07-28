@@ -4,3 +4,4 @@ apscheduler
 python-dotenv
 gunicorn
 whitenoise
+web3
