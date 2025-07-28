@@ -34,4 +34,9 @@ urlpatterns = [
         views.api_coinstore_price,
         name="api_coinstore_price",
     ),
+    path(
+        "api/live_prices/",
+        views.api_live_prices,
+        name="api_live_prices",
+    ),
 ]
