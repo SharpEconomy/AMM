@@ -12,7 +12,10 @@ UNISWAP_API_URL = os.environ.get(
     "UNISWAP_API_URL",
     "https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon",
 )
-POOL_ADDRESS = os.environ.get("POOL_ADDRESS", "").lower()
+POOL_ADDRESS = (
+    os.environ.get("POOL_ADDRESS")
+    or os.environ.get("UNISWAP_POOL_ADDRESS", "")
+).lower()
 
 QUERY = """
 query ($id: ID!) {

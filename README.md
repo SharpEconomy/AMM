@@ -8,9 +8,10 @@ Proof-of-concept Django app for monitoring a Uniswap V3 liquidity pool on Polygo
    ```bash
    pip install -r requirements.txt
    ```
-2. Create a `.env` file and set the required variables (`POOL_ADDRESS`, etc).
-   The app queries the Uniswap V3 API directly and no RPC provider is needed.
-   Without network access the live prices will show as `N/A`.
+2. Copy `.env.example` to `.env` and fill in the variables (`UNISWAP_POOL_ADDRESS`,
+   `COINSTORE_API_KEY`, `BITMART_API_KEY`, etc). The app queries the Uniswap V3
+   API directly and no RPC provider is needed. Without network access the live
+   prices will show as `N/A`.
 3. Start the development server. Pending migrations run automatically (set
    `AUTO_MIGRATE=0` to disable):
    ```bash
@@ -51,12 +52,12 @@ variables in the Render dashboard:
 - `DJANGO_SECRET_KEY` – your Django secret key
 - `POOL_ADDRESS` – Uniswap V3 pool address
 - `UNISWAP_API_URL` – optional GraphQL endpoint override
-- `OTP_SECRET` – base32 secret for Microsoft Authenticator login
+- `COINSTORE_API_KEY` – optional API key for Coinstore requests
+- `BITMART_API_KEY` – optional API key for Bitmart requests
 - `PRIVATE_KEY` – optional wallet key for write actions
 - `PRICE_THRESHOLD` – optional percentage threshold (default `1.0`)
 - `SYNC_INTERVAL_SECONDS` – how often to fetch prices (default `60`)
 - `RUN_SCHEDULER` – set to `1` to start the APScheduler in the web process
-- `OTP_SECRET` – base32 secret for TOTP login
 - `ALLOWED_HOSTS` – comma-separated list of allowed hosts (optional)
 - `RENDER_EXTERNAL_HOSTNAME` will be added automatically if provided by Render
 
