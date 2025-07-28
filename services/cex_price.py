@@ -10,7 +10,10 @@ import requests
 
 BITMART_URL = "https://api-cloud.bitmart.com/spot/quotation/v3/tickers?symbol=SHARP_USDT"
 COINSTORE_API_URL = "https://api.coinstore.com/api/v1/ticker/price"
-
+coinstore_headers = {
+    "accept": "application/json",
+    "X-API-KEY": "cc5025cfef8568b17256a6dabaa96b41"
+}
 
 def _safe_request(url: str) -> Optional[str]:
     """Return response text or ``None`` and log failures."""
