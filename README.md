@@ -54,12 +54,10 @@ variables in the Render dashboard:
 - `UNISWAP_API_URL` – optional GraphQL endpoint override
 - `COINSTORE_API_KEY` – optional API key for Coinstore requests
 - `BITMART_API_KEY` – optional API key for Bitmart requests
-- `OTP_SECRET` – base32 secret for Microsoft Authenticator login
 - `PRIVATE_KEY` – optional wallet key for write actions
 - `PRICE_THRESHOLD` – optional percentage threshold (default `1.0`)
 - `SYNC_INTERVAL_SECONDS` – how often to fetch prices (default `60`)
 - `RUN_SCHEDULER` – set to `1` to start the APScheduler in the web process
-- `OTP_SECRET` – base32 secret for TOTP login
 - `ALLOWED_HOSTS` – comma-separated list of allowed hosts (optional)
 - `RENDER_EXTERNAL_HOSTNAME` will be added automatically if provided by Render
 
