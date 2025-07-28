@@ -9,7 +9,7 @@ from typing import Optional, Tuple
 import requests
 
 BITMART_URL = "https://api-cloud.bitmart.com/spot/quotation/v3/tickers?symbol=SHARP_USDT"
-COINSTORE_URL = "https://api.coinstore.com/api/v1/ticker/price"
+COINSTORE_AP_URL = "https://api.coinstore.com/api/v1/ticker/price"
 
 
 def _safe_request(url: str) -> Optional[str]:
@@ -47,7 +47,7 @@ def fetch_bitmart_price() -> Optional[float]:
 
 def fetch_coinstore_price() -> Optional[float]:
     """Return the latest Coinstore price or ``None`` on failure."""
-    text = _safe_request(COINSTORE_URL)
+    text = _safe_request(COINSTORE_API_URL)
     try:
         response = requests.get(
             COINSTORE_API_URL,
