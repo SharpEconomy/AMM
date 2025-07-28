@@ -11,6 +11,7 @@ from django.views.decorators.http import require_POST
 
 from .models import OpportunityLog, PriceSnapshot
 from services.uniswap import get_pool_data
+from services.uniswap_web3 import get_uniswap_price as get_live_uniswap_price
 from services.cex_price import (
     fetch_bitmart_price,
     fetch_coinstore_price,
@@ -129,3 +130,18 @@ def api_coinstore_price(request: HttpRequest) -> JsonResponse:
 
     price = fetch_coinstore_price()
     return JsonResponse({"price": price})
+
+
+def api_live_prices(request: HttpRequest) -> JsonResponse:
+    """Return current prices from each source without using the DB."""
+
+    uni = get_live_uniswap_price()
+    bm = fetch_bitmart_price()
+    cs = fetch_coinstore_price()
+    return JsonResponse(
+        {
+            "uniswap_price": uni,
+            "bitmart_price": bm,
+            "coinstore_price": cs,
+        }
+    )
