@@ -52,12 +52,12 @@ def fetch_coinstore_price() -> Optional[float]:
         response = requests.get(
             COINSTORE_API_URL,
             headers=coinstore_headers,
-            params={"symbol": "sharpusdt"}
+            params={"symbol": "SHARPUSDT"}
         )
         data = response.json()
         if data.get("data") and isinstance(data["data"], list):
             for token in data["data"]:
-                if token.get("symbol") == "sharpusdt" and token.get("price") is not None:
+                if token.get("symbol") == "SHARPUSDT" and token.get("price") is not None:
                     return float(token["price"])
     except Exception as e:
         print("Coinstore API fetch error:", e)
