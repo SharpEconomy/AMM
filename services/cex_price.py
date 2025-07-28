@@ -32,10 +32,15 @@ def fetch_bitmart_price() -> Optional[float]:
         tickers = data.get("data")
         if isinstance(tickers, dict):
             tickers = tickers.get("tickers")
-        if isinstance(tickers, list) and tickers:
-            ticker = tickers[0]
-            if isinstance(ticker, dict) and "last_price" in ticker:
-                return float(ticker["last_price"])
+
+        if isinstance(tickers, list):
+            for t in tickers:
+                # Handle both dict and list formats returned by the API
+                if isinstance(t, dict):
+                    if t.get("symbol") == "SHARP_USDT" and t.get("last_price") is not None:
+                        return float(t["last_price"])
+                elif isinstance(t, list) and len(t) >= 2 and t[0] == "SHARP_USDT":
+                    return float(t[1])
     except (ValueError, json.JSONDecodeError, TypeError) as exc:
         logging.warning("Failed to parse Bitmart response: %s", exc)
     return None
