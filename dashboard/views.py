@@ -10,15 +10,12 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .models import OpportunityLog, PriceSnapshot
-from services.uniswap import get_pool_data
 from services.uniswap_web3 import get_uniswap_price as get_live_uniswap_price
 from services.cex_price import (
     fetch_bitmart_price,
     fetch_coinstore_price,
     get_average_price,
 )
-from jobs.sync import sync_prices
-
 
 def dashboard(request: HttpRequest) -> HttpResponse:
     """Render dashboard page."""
