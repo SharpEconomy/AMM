@@ -44,3 +44,6 @@ def fetch_coinstore_price():
     except Exception as e:
         print("Coinstore API fetch error:", e)
     return None
+
+def get_average_price():
+    pass
