@@ -9,7 +9,7 @@ from typing import Optional, Tuple
 import requests
 
 BITMART_URL = "https://api-cloud.bitmart.com/spot/quotation/v3/tickers?symbol=SHARP_USDT"
-COINSTORE_AP_URL = "https://api.coinstore.com/api/v1/ticker/price"
+COINSTORE_API_URL = "https://api.coinstore.com/api/v1/ticker/price"
 
 
 def _safe_request(url: str) -> Optional[str]:
